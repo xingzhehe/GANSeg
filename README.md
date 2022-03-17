@@ -1,7 +1,7 @@
 # GANSeg: Learning to Segment by Unsupervised Hierarchical Image Generation (CVPR 2022)
 ![](assets/teaser.png)
->**GANSeg: Learning to Segment by Unsupervised Hierarchical Image Generation**
->[Xingzhe He](https://xingzhehe.github.io/), [Bastian Wandt](http://bastianwandt.de/), and [Helge Rhodin](http://helge.rhodin.de/)
+>**GANSeg: Learning to Segment by Unsupervised Hierarchical Image Generation** <br>
+>[Xingzhe He](https://xingzhehe.github.io/), [Bastian Wandt](http://bastianwandt.de/), and [Helge Rhodin](http://helge.rhodin.de/) <br>
 >*IEEE/CVF Conference on Computer Vision and Pattern Recognition **CVPR 2022***
 
 [[Paper](https://arxiv.org/abs/2112.01036)]
