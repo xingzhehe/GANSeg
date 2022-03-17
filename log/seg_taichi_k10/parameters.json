@@ -1,0 +1,13 @@
+{
+  "model": "segmenter",
+  "generator_log": "log/gan_taichi_k10",
+  "batch_size": 64,
+  "lr": 0.0003,
+  "data_root": "../data/taichi",
+  "num_workers": 6,
+  "checkpoint": 30,
+  "log": "log/seg_taichi_k10",
+  "image_size": 128,
+  "test_kp_error": 417.1712830162048,
+  "test_iou": 0.8538789749145508
+}

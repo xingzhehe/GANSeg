@@ -1,0 +1,12 @@
+{
+  "model": "segmenter",
+  "generator_log": "log/gan_flower_k8",
+  "batch_size": 64,
+  "lr": 0.0003,
+  "data_root": "../data/flower",
+  "num_workers": 6,
+  "checkpoint": 30,
+  "log": "log/seg_flower_k8",
+  "image_size": 128,
+  "test_iou": 0.7390740900974648
+}
