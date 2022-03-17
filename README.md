@@ -31,7 +31,7 @@ You can use `gen_mask.py` to generate the segmentation masks.
 python gen_mask.py --segmenter_log log/seg_celeba_wild_k8 --test_class_name mafl_wild_test --data_root data/celeba_wild --save_root saved_mask/celeba_wild_k8 --checkpoint 10
 ```
 where, 
-- `--log` specifies the log folder of the segmentation network,
+- `--segmenter_log` specifies the log folder of the segmentation network,
 - `--test_class_name` specifices the particular dataset to test, 
 - `--data_root` specifies the location of the dataset (the folder containing the `h5` file), 
 - `--save_root` defines the location of the saved images, and
