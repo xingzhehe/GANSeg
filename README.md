@@ -87,11 +87,11 @@ where,
 ## Citation
 
 ```
-@article{he2021ganseg,
+@inproceedings{he2021ganseg,
   title={GANSeg: Learning to Segment by Unsupervised Hierarchical Image Generation},
   author={He, Xingzhe and Wandt, Bastian and Rhodin, Helge},
-  journal={arXiv preprint arXiv:2112.01036},
-  year={2021}
+  booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+  year={2022}
 }
 ```
 ## Acknowledgements
