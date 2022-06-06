@@ -146,70 +146,124 @@ class Generator(nn.Module):
 
         self.keypoints_embedding = nn.Embedding(self.n_keypoints, self.n_embedding)
 
-        # self.gen_keypoints_embedding_noise = nn.Sequential(
-        #     *([LinearLeakyReLU(self.z_dim, self.z_dim)] * 3),
-        #     nn.Linear(self.z_dim, self.n_embedding),
-        # )
-        #
-        # self.gen_keypoints_layer = nn.Sequential(
-        #     *([LinearLeakyReLU(self.z_dim, self.z_dim)] * 4),
-        #     nn.Linear(self.z_dim, self.n_points * 2),
-        #     )
-        #
-        # self.gen_background_embedding = nn.Sequential(
-        #     *([LinearLeakyReLU(self.z_dim, self.z_dim)] * 3),
-        #     nn.Linear(self.z_dim, self.n_embedding),
-        # )
-        # I don't know why there seems a bug in the above code. It looks equivalent to the code below.
+        if 'celeba' in hyper_paras['class_name'] or 'taichi' in hyper_paras['class_name'] or \
+                'flower' in hyper_paras['class_name'] or 'cub' in hyper_paras['class_name']:
 
-        self.gen_keypoints_embedding_noise = nn.Sequential(
-            LinearLeakyReLU(self.z_dim, self.z_dim),
-            LinearLeakyReLU(self.z_dim, self.z_dim),
-            LinearLeakyReLU(self.z_dim, self.z_dim),
-            nn.Linear(self.z_dim, self.n_embedding),
-        )
+            self.gen_keypoints_embedding_noise = nn.Sequential(
+                LinearLeakyReLU(self.z_dim, self.z_dim),
+                LinearLeakyReLU(self.z_dim, self.z_dim),
+                LinearLeakyReLU(self.z_dim, self.z_dim),
+                nn.Linear(self.z_dim, self.n_embedding),
+            )
 
-        self.gen_keypoints_layer = nn.Sequential(
-            LinearLeakyReLU(self.z_dim, self.z_dim),
-            LinearLeakyReLU(self.z_dim, self.z_dim),
-            LinearLeakyReLU(self.z_dim, self.z_dim),
-            LinearLeakyReLU(self.z_dim, self.z_dim),
-            nn.Linear(self.z_dim, self.n_points * 2),
-        )
+            self.gen_keypoints_layer = nn.Sequential(
+                LinearLeakyReLU(self.z_dim, self.z_dim),
+                LinearLeakyReLU(self.z_dim, self.z_dim),
+                LinearLeakyReLU(self.z_dim, self.z_dim),
+                LinearLeakyReLU(self.z_dim, self.z_dim),
+                nn.Linear(self.z_dim, self.n_points * 2),
+            )
 
-        self.gen_background_embedding = nn.Sequential(
-            LinearLeakyReLU(self.z_dim, self.z_dim),
-            LinearLeakyReLU(self.z_dim, self.z_dim),
-            LinearLeakyReLU(self.z_dim, self.z_dim),
-            nn.Linear(self.z_dim, self.n_embedding),
-        )
+            self.gen_background_embedding = nn.Sequential(
+                LinearLeakyReLU(self.z_dim, self.z_dim),
+                LinearLeakyReLU(self.z_dim, self.z_dim),
+                LinearLeakyReLU(self.z_dim, self.z_dim),
+                nn.Linear(self.z_dim, self.n_embedding),
+            )
+
+            if 'flower' in hyper_paras['class_name'] or 'cub' in hyper_paras['class_name']:
+                self.mask_spade_blocks = nn.ModuleList([
+                    SPADEResBlk(512, self.n_embedding, self.n_embedding, self.n_keypoints - 1),  # 32
+                    SPADEResBlk(self.n_embedding, self.n_embedding, self.n_embedding, self.n_keypoints - 1),  # 32
+                    SPADEResBlk(self.n_embedding, self.n_embedding, self.n_embedding, self.n_keypoints - 1),  # 64
+                    SPADEResBlk(self.n_embedding, self.n_embedding, self.n_embedding, self.n_keypoints - 1),  # 64
+                    SPADEResBlk(self.n_embedding, self.n_embedding, self.n_embedding, self.n_keypoints - 1),  # 128
+                    SPADEResBlk(self.n_embedding, self.n_keypoints + 1, self.n_embedding, self.n_keypoints - 1),  # 128
+                ])
+
+                self.spade_blocks = nn.ModuleList([
+                    SPADEResBlk(512, 256, self.n_embedding, self.n_keypoints - 1),  # 32
+                    SPADEResBlk(256, 256, self.n_embedding, self.n_keypoints - 1),  # 32
+                    SPADEResBlk(256, 128, self.n_embedding, self.n_keypoints - 1),  # 64
+                    SPADEResBlk(128, 128, self.n_embedding, self.n_keypoints - 1),  # 64
+                    SPADEResBlk(128, self.n_embedding, self.n_embedding, self.n_keypoints - 1),  # 128
+                    SPADEResBlk(self.n_embedding, self.n_embedding, self.n_embedding, self.n_keypoints - 1),  # 128
+                ])
+
+                self.adain_blocks = nn.ModuleList([
+                    AdaINResBlk(512, 256, self.n_embedding),  # 32
+                    AdaINResBlk(256, 256, self.n_embedding),  # 32
+                    AdaINResBlk(256, 128, self.n_embedding),  # 64
+                    AdaINResBlk(128, 128, self.n_embedding),  # 64
+                    AdaINResBlk(128, self.n_embedding, self.n_embedding),  # 128
+                    AdaINResBlk(self.n_embedding, self.n_embedding, self.n_embedding),  # 128
+                ])
+
+            else:
+                self.mask_spade_blocks = nn.ModuleList([
+                    SPADEResBlk(512, self.n_embedding, self.n_embedding, self.n_keypoints - 1),  # 32
+                    SPADEResBlk(self.n_embedding, self.n_embedding, self.n_embedding, self.n_keypoints - 1),  # 64
+                    SPADEResBlk(self.n_embedding, self.n_embedding, self.n_embedding, self.n_keypoints - 1),  # 128
+                    SPADEResBlk(self.n_embedding, self.n_keypoints + 1, self.n_embedding, self.n_keypoints - 1),  # 128
+                ])
+
+                self.spade_blocks = nn.ModuleList([
+                    SPADEResBlk(512, 256, self.n_embedding, self.n_keypoints - 1),  # 32
+                    SPADEResBlk(256, 128, self.n_embedding, self.n_keypoints - 1),  # 64
+                    SPADEResBlk(128, self.n_embedding, self.n_embedding, self.n_keypoints - 1),  # 128
+                    SPADEResBlk(self.n_embedding, self.n_embedding, self.n_embedding, self.n_keypoints - 1),  # 128
+                ])
+
+                self.adain_blocks = nn.ModuleList([
+                    AdaINResBlk(512, 256, self.n_embedding),  # 32
+                    AdaINResBlk(256, 128, self.n_embedding),  # 64
+                    AdaINResBlk(128, self.n_embedding, self.n_embedding),  # 128
+                    AdaINResBlk(self.n_embedding, self.n_embedding, self.n_embedding),  # 128
+                ])
+
+        # # I don't know why there seems a bug in the code below. It looks equivalent to the code above.
+        else:
+            self.gen_keypoints_embedding_noise = nn.Sequential(
+                *([LinearLeakyReLU(self.z_dim, self.z_dim)] * 3),
+                nn.Linear(self.z_dim, self.n_embedding),
+            )
+
+            self.gen_keypoints_layer = nn.Sequential(
+                *([LinearLeakyReLU(self.z_dim, self.z_dim)] * 4),
+                nn.Linear(self.z_dim, self.n_points * 2),
+                )
+
+            self.gen_background_embedding = nn.Sequential(
+                *([LinearLeakyReLU(self.z_dim, self.z_dim)] * 3),
+                nn.Linear(self.z_dim, self.n_embedding),
+            )
+
+            self.mask_spade_blocks = nn.ModuleList([
+                SPADEResBlk(self.feature_map_channels[0], self.n_embedding, self.n_embedding, self.n_keypoints - 1),
+                *([SPADEResBlk(self.n_embedding, self.n_embedding, self.n_embedding, self.n_keypoints - 1)] *
+                  (len(self.feature_map_sizes) - 2)),
+                SPADEResBlk(self.n_embedding, self.n_keypoints+1, self.n_embedding, self.n_keypoints - 1)
+            ])
+
+            self.spade_blocks = nn.ModuleList([])
+            for i in range(len(self.feature_map_channels) - 1):
+                self.spade_blocks.append(SPADEResBlk(self.feature_map_channels[i], self.feature_map_channels[i + 1],
+                                                     self.n_embedding, self.n_keypoints - 1))
+            self.spade_blocks.append(SPADEResBlk(self.feature_map_channels[-1], self.n_embedding,
+                                                 self.n_embedding, self.n_keypoints - 1))
+
+            self.adain_blocks = nn.ModuleList([])
+            for i in range(len(self.feature_map_channels) - 1):
+                self.adain_blocks.append(AdaINResBlk(self.feature_map_channels[i], self.feature_map_channels[i + 1],
+                                                     self.n_embedding))
+            self.adain_blocks.append(AdaINResBlk(self.feature_map_channels[-1], self.n_embedding,
+                                                 self.n_embedding))
 
         self.x_start = PositionalEmbedding(n_keypoints=self.n_keypoints, out_channels=self.feature_map_channels[0])
         self.mask_start = PositionalEmbedding(n_keypoints=self.n_points, out_channels=self.feature_map_channels[0])
         self.bg_start = PositionalEmbedding(n_keypoints=1, out_channels=self.feature_map_channels[0])
 
         self.rep_pad = nn.ReplicationPad2d(self.extend_pixel)
-
-        self.mask_spade_blocks = nn.ModuleList([
-            SPADEResBlk(self.feature_map_channels[0], self.n_embedding, self.n_embedding, self.n_keypoints - 1),
-            *([SPADEResBlk(self.n_embedding, self.n_embedding, self.n_embedding, self.n_keypoints - 1)] *
-              (len(self.feature_map_sizes) - 2)),
-            SPADEResBlk(self.n_embedding, self.n_keypoints+1, self.n_embedding, self.n_keypoints - 1)
-        ])
-
-        self.spade_blocks = nn.ModuleList([])
-        for i in range(len(self.feature_map_channels) - 1):
-            self.spade_blocks.append(SPADEResBlk(self.feature_map_channels[i], self.feature_map_channels[i + 1],
-                                                 self.n_embedding, self.n_keypoints - 1))
-        self.spade_blocks.append(SPADEResBlk(self.feature_map_channels[-1], self.n_embedding,
-                                             self.n_embedding, self.n_keypoints - 1))
-
-        self.adain_blocks = nn.ModuleList([])
-        for i in range(len(self.feature_map_channels) - 1):
-            self.adain_blocks.append(AdaINResBlk(self.feature_map_channels[i], self.feature_map_channels[i + 1],
-                                                 self.n_embedding))
-        self.adain_blocks.append(AdaINResBlk(self.feature_map_channels[-1], self.n_embedding,
-                                             self.n_embedding))
 
         if self.single_final:
             self.conv = nn.Sequential(
