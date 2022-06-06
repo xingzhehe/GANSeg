@@ -146,18 +146,41 @@ class Generator(nn.Module):
 
         self.keypoints_embedding = nn.Embedding(self.n_keypoints, self.n_embedding)
 
+        # self.gen_keypoints_embedding_noise = nn.Sequential(
+        #     *([LinearLeakyReLU(self.z_dim, self.z_dim)] * 3),
+        #     nn.Linear(self.z_dim, self.n_embedding),
+        # )
+        #
+        # self.gen_keypoints_layer = nn.Sequential(
+        #     *([LinearLeakyReLU(self.z_dim, self.z_dim)] * 4),
+        #     nn.Linear(self.z_dim, self.n_points * 2),
+        #     )
+        #
+        # self.gen_background_embedding = nn.Sequential(
+        #     *([LinearLeakyReLU(self.z_dim, self.z_dim)] * 3),
+        #     nn.Linear(self.z_dim, self.n_embedding),
+        # )
+        # I don't know why there seems a bug in the above code. It looks equivalent to the code below.
+
         self.gen_keypoints_embedding_noise = nn.Sequential(
-            *([LinearLeakyReLU(self.z_dim, self.z_dim)] * 3),
+            LinearLeakyReLU(self.z_dim, self.z_dim),
+            LinearLeakyReLU(self.z_dim, self.z_dim),
+            LinearLeakyReLU(self.z_dim, self.z_dim),
             nn.Linear(self.z_dim, self.n_embedding),
         )
 
         self.gen_keypoints_layer = nn.Sequential(
-            *([LinearLeakyReLU(self.z_dim, self.z_dim)] * 4),
+            LinearLeakyReLU(self.z_dim, self.z_dim),
+            LinearLeakyReLU(self.z_dim, self.z_dim),
+            LinearLeakyReLU(self.z_dim, self.z_dim),
+            LinearLeakyReLU(self.z_dim, self.z_dim),
             nn.Linear(self.z_dim, self.n_points * 2),
-            )
+        )
 
         self.gen_background_embedding = nn.Sequential(
-            *([LinearLeakyReLU(self.z_dim, self.z_dim)] * 3),
+            LinearLeakyReLU(self.z_dim, self.z_dim),
+            LinearLeakyReLU(self.z_dim, self.z_dim),
+            LinearLeakyReLU(self.z_dim, self.z_dim),
             nn.Linear(self.z_dim, self.n_embedding),
         )
 
