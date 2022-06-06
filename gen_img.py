@@ -31,7 +31,8 @@ generator = gen_model.Generator({'z_dim': generator_args['z_dim'], 'n_keypoints'
                                  'single_final': generator_args['single_final'], 'use_linear': generator_args['use_linear'],
                                  'smaller_init_mask': generator_args['smaller_init_mask'],
                                  'feature_map_sizes': generator_args['feature_map_sizes'],
-                                 'feature_map_channels': generator_args['feature_map_channels'],}).to(device)
+                                 'feature_map_channels': generator_args['feature_map_channels'],
+                                 'class_name': generator_args['class_name'],}).to(device)
 gen_checkpoint = torch.load(os.path.join(generator_args['log'], 'checkpoints', 'epoch_{}.model'.format(args.checkpoint)),
                             map_location=lambda storage, location: storage)
 generator.load_state_dict(gen_checkpoint['generator'])
