@@ -91,6 +91,7 @@ where,
   title={GANSeg: Learning to Segment by Unsupervised Hierarchical Image Generation},
   author={He, Xingzhe and Wandt, Bastian and Rhodin, Helge},
   booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+  pages={1225--1235},
   year={2022}
 }
 ```
