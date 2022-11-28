@@ -63,7 +63,8 @@ generator = model.Generator({'z_dim': args.z_dim, 'n_keypoints': args.n_keypoint
                              'n_embedding': args.n_embedding, 'image_size': args.image_size,
                              'single_final': args.single_final, 'use_linear': args.use_linear,
                              'smaller_init_mask': args.smaller_init_mask, 'feature_map_sizes': args.feature_map_sizes,
-                             'feature_map_channels': args.feature_map_channels}).to(device)
+                             'feature_map_channels': args.feature_map_channels,
+                             'class_name': args.class_name}).to(device)
 dis_model = importlib.import_module('models.' + args.dis_model)
 discriminator = dis_model.Discriminator({}).to(device)
 optim_disc = torch.optim.Adam(discriminator.parameters(), lr=args.lr_disc, betas=(0.5, 0.9))
